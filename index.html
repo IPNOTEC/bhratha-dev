@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHRATHA | Founding Council Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --text-main: #FFFFFF;
+            --orange: #FF8C00;  /* B in orange */
+            --green: #00FF7F;   /* R in green */
+            --blue: #007BFF;    /* Rupee symbol in blue */
+            --dim-gray: #1A1A1A;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle, #1a1a1a 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        h1, h2, .persona-title { font-family: 'Orbitron', sans-serif; }
+
+        .bh-letter { color: var(--orange); }
+        .r-letter { color: var(--green); }
+        .rupee { color: var(--blue); }
+
+        .section-container { display: none; }
+        .section-container.active { 
+            display: block; 
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .cover-slide {
+            display: none;
+            padding: 40px;
+            min-height: 80vh;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .cover-slide.active {
+            display: block;
+        }
+
+        .slide-navigation {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 100;
+        }
+
+        .slide-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-dot.active {
+            background: var(--blue);
+            transform: scale(1.2);
+        }
+
+        .question-card {
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid var(--dim-gray);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .question-card:hover {
+            border-color: var(--orange);
+            background: rgba(255, 140, 0, 0.05);
+            transform: scale(1.02);
+        }
+
+        .question-card.selected {
+            border-color: var(--green);
+            background: rgba(0, 255, 127, 0.1);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(to right, var(--orange), var(--green));
+            transition: width 0.4s ease;
+        }
+
+        .btn-primary {
+            border: 1px solid var(--orange);
+            color: var(--orange);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            padding: 12px 30px;
+            background: transparent;
+        }
+
+        .btn-primary:hover {
+            background: var(--orange);
+            color: black;
+            box-shadow: 0 0 20px var(--orange);
+        }
+
+        .interest-radio {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .radio-option {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 8px;
+            accent-color: var(--green);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: var(--bg);
+            border: 1px solid var(--orange);
+            padding: 40px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--orange);
+            display: inline-block;
+            margin-right: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .checkbox-custom.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--orange);
+        }
+
+        .text-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--dim-gray);
+            color: var(--text-main);
+            padding: 12px;
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--orange);
+        }
+
+        .daily-actions {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--green);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .daily-actions h4 {
+            color: var(--orange);
+            margin-bottom: 10px;
+        }
+
+        .daily-actions ul {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+
+        .daily-actions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Slides -->
+    <div id="cover" class="section-container active">
+        <!-- Slide 1 -->
+        <div class="cover-slide active">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h1 class="text-5xl font-bold mb-10 tracking-widest">
+                    <span class="bh-letter">B</span><span class="r-letter">HRATHA</span> <span class="rupee">•</span>
+                </h1>
+                <div class="text-2xl mb-6 text-gray-300 uppercase">A Section 8 Non-Profit Institution</div>
+                <div class="text-4xl mb-10" style="color: var(--green);">The Mission: 19,101 Pin Codes</div>
+                <div class="text-3xl mb-16">One Standard of Safety</div>
+                <div class="text-2xl italic text-gray-400 mt-20">The Future of Women's Work is Local</div>
+            </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">The Ask</h2>
+                <div class="text-5xl mb-8" style="color: var(--blue);">₹1.08 Crore</div>
+                <div class="text-xl mb-6 text-gray-300">Capitalization for "Foundation Phase"</div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+                    <div class="p-6 border border-gray-800">
+                        <h3 class="text-lg mb-4" style="color: var(--green);">3X Investment Strategy</h3>
+                        <p class="text-gray-400">BHRATHA is not a pilot; it is a System Protocol</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h3 class="text-lg mb-4" style="color: var(--green);">Safety Over-Indexing</h3>
+                        <p class="text-gray-400">40% budget locked into proprietary safety tech</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h3 class="text-lg mb-4" style="color: var(--green);">Infrastructure Durability</h3>
+                        <p class="text-gray-400">"Gold-Standard" MVPs that last decades</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">The "Forever" Governance</h2>
+                <div class="text-2xl mb-8" style="color: var(--green);">8-Council Founders</div>
+                
+                <div class="p-8 mb-10 border-l-4" style="border-color: var(--blue); background: rgba(0, 123, 255, 0.1);">
+                    <p class="text-xl mb-4">The Founding Council consists of 8 Women Professionals who hold permanent, non-transferable stewardship of the Foundation.</p>
+                    <p class="text-lg mb-4" style="color: var(--orange);">The Ground Rule: The Council is 100% Female</p>
+                    <p class="text-gray-400">Succession is by invitation only to maintain the institutional DNA</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-2" style="color: var(--green);">Structure</h4>
+                        <p>They serve as the "Subscribers" and "Permanent Directors"</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-2" style="color: var(--green);">Mission Protection</h4>
+                        <p>Ensuring BHRATHA can never be diluted or commercialized</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">The Professional Personas</h2>
+                <div class="text-xl mb-8 text-gray-300">The Founding Council</div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full border border-gray-800">
+                        <thead>
+                            <tr class="border-b border-gray-800">
+                                <th class="p-4 text-left" style="color: var(--green);">Vertical</th>
+                                <th class="p-4 text-left" style="color: var(--green);">Persona</th>
+                                <th class="p-4 text-left" style="color: var(--green);">Core Responsibility</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Regulation</td>
+                                <td class="p-4">The Bureaucrat</td>
+                                <td class="p-4">Gov. Liaison & Policy Navigation</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Fiscal</td>
+                                <td class="p-4">The Accountant</td>
+                                <td class="p-4">Transparency & 12A/80G Compliance</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Design</td>
+                                <td class="p-4">The Architect</td>
+                                <td class="p-4">Futuristic Hub Interior & Standardized Blueprints</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Execution</td>
+                                <td class="p-4">The Builder</td>
+                                <td class="p-4">Physical Construction & Supply Chain</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Nourishment</td>
+                                <td class="p-4">The Kitchen Specialist</td>
+                                <td class="p-4">Cafe Operations & Nutrition Standards</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Justice</td>
+                                <td class="p-4">The Lawyer</td>
+                                <td class="p-4">Supreme Court Advocacy & TM Protection</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Wellness</td>
+                                <td class="p-4">The Doctor</td>
+                                <td class="p-4">Crèche Safety & Women's Health Protocols</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">Brand</td>
+                                <td class="p-4">The Media Mogul</td>
+                                <td class="p-4">National Narrative & GTM Strategy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">The "Lijjat" Inspired MVP Model</h2>
+                
+                <div class="mb-10">
+                    <div class="text-2xl mb-6" style="color: var(--green);">The "Housewives Society" Strategy</div>
+                    <p class="text-lg mb-8">Lijjat Papad proved that the greatest untapped economic engine in India is the household. BHRATHA MVPs are located within or adjacent to Housewives Societies and residential clusters.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">Low Friction</h4>
+                        <p class="text-gray-400">We bring the professional world to the doorstep of the "Hidden Workforce"</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">Collective Ownership</h4>
+                        <p class="text-gray-400">Like the Lijjat model, the women using the space have a "Sisterhood Stake"</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">High Footfall</h4>
+                        <p class="text-gray-400">Located in high-density areas for 100% utilization</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">Technical & Safety Integration</h2>
+                <div class="text-2xl mb-8" style="color: var(--blue);">The 40% Pivot</div>
+                
+                <div class="mb-10">
+                    <h3 class="text-xl mb-4" style="color: var(--green);">Why Tech-First?</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">IoT Surveillance</h4>
+                        <p class="text-gray-400">AI-driven behavior monitoring for 100% safety</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">Access Protocols</h4>
+                        <p class="text-gray-400">App-based biometric entry for every hub</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">Central Nervous System</h4>
+                        <p class="text-gray-400">Unified cloud platform to manage all 19,000+ hubs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">The Operational Engine</h2>
+                <div class="text-xl mb-8 text-gray-300">Salaried Trio</div>
+                <p class="mb-10">To protect the non-profit mission, the Founders appoint three industry titans:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-8 border border-gray-800">
+                        <h3 class="text-2xl mb-4" style="color: var(--blue);">CEO</h3>
+                        <div class="text-lg mb-2" style="color: var(--green);">The Techie</div>
+                        <p class="text-gray-400">Architect of the BHRATHA Platform</p>
+                    </div>
+                    <div class="p-8 border border-gray-800">
+                        <h3 class="text-2xl mb-4" style="color: var(--blue);">CFO</h3>
+                        <div class="text-lg mb-2" style="color: var(--green);">The RBI Veteran</div>
+                        <p class="text-gray-400">Institutional-grade fund management</p>
+                    </div>
+                    <div class="p-8 border border-gray-800">
+                        <h3 class="text-2xl mb-4" style="color: var(--blue);">CMO</h3>
+                        <div class="text-lg mb-2" style="color: var(--green);">The Storyteller</div>
+                        <p class="text-gray-400">National Brand Equity Lead</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">Scaling to 19,101 Pin Codes</h2>
+                
+                <div class="text-center mb-12 p-8 border border-gray-800">
+                    <div class="text-5xl mb-4" style="color: var(--green);">2,10,111 Jobs</div>
+                    <p class="text-xl">Local employment created across India</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">11-Person Micro-Economy</h4>
+                        <p class="text-gray-400">Each Pin Code Hub creates 11 salaried roles (19,101 × 11 = 2,10,111 Jobs)</p>
+                    </div>
+                    <div class="p-6 border border-gray-800">
+                        <h4 class="text-lg mb-4" style="color: var(--green);">Revenue Recycling</h4>
+                        <p class="text-gray-400">Nominal membership fees cover the local 11-person team, making each hub self-sustaining after Year 1</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">Financial Allocation</h2>
+                <div class="text-2xl mb-8" style="color: var(--blue);">The Detailed Ask</div>
+                
+                <div class="overflow-x-auto mb-10">
+                    <table class="w-full border border-gray-800">
+                        <thead>
+                            <tr class="border-b border-gray-800">
+                                <th class="p-4 text-left" style="color: var(--green);">Segment</th>
+                                <th class="p-4 text-left" style="color: var(--green);">Allocation (INR)</th>
+                                <th class="p-4 text-left" style="color: var(--green);">Primary Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Tech & Integrations</td>
+                                <td class="p-4" style="color: var(--blue);">₹43.2 Lakh</td>
+                                <td class="p-4">"Bhratha Core" App & Security Stack</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">MVP Setups (3 Hubs)</td>
+                                <td class="p-4" style="color: var(--blue);">₹32.4 Lakh</td>
+                                <td class="p-4">3 Residential "Gold Standard" Hubs</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="p-4">Leadership Runway</td>
+                                <td class="p-4" style="color: var(--blue);">₹21.6 Lakh</td>
+                                <td class="p-4">Salaries for CEO/CFO/CMO (Initial)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">Legal & Compliance</td>
+                                <td class="p-4" style="color: var(--blue);">₹10.8 Lakh</td>
+                                <td class="p-4">TM, Section 8, PAN/TAN, 12A/80G</td>
+                            </tr>
+                            <tr class="bg-gray-900">
+                                <td class="p-4 font-bold">TOTAL</td>
+                                <td class="p-4 font-bold text-2xl" style="color: var(--green);">₹1.08 Crore</td>
+                                <td class="p-4"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="cover-slide">
+            <div class="max-w-4xl mx-auto pt-20">
+                <h2 class="text-3xl mb-10 uppercase" style="color: var(--orange);">The Impact</h2>
+                <div class="text-2xl mb-8" style="color: var(--green);">Social ROI</div>
+                
+                <div class="text-center mb-12 p-8 border" style="border-color: var(--blue);">
+                    <p class="text-xl mb-6">The BHRATHA Promise:</p>
+                    <p class="text-2xl mb-8">By funding the initial ₹1.08 Crore, you are not just building a coworking space; you are commissioning the Operating System for the Indian Woman.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="p-6 border border-gray-800 text-center">
+                        <div class="text-3xl mb-4" style="color: var(--green);">100%</div>
+                        <p>Non-Profit</p>
+                    </div>
+                    <div class="p-6 border border-gray-800 text-center">
+                        <div class="text-3xl mb-4" style="color: var(--green);">100%</div>
+                        <p>Female-Led</p>
+                    </div>
+                    <div class="p-6 border border-gray-800 text-center">
+                        <div class="text-3xl mb-4" style="color: var(--green);">100%</div>
+                        <p>India-Focused</p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-10 border-t border-gray-800">
+                    <h3 class="text-2xl mb-4 uppercase">BHRATHA FOUNDATION</h3>
+                    <p class="text-xl" style="color: var(--orange);">Join the Council</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Navigation -->
+        <div class="slide-navigation">
+            <div class="flex">
+                <div class="slide-dot active" data-slide="0"></div>
+                <div class="slide-dot" data-slide="1"></div>
+                <div class="slide-dot" data-slide="2"></div>
+                <div class="slide-dot" data-slide="3"></div>
+                <div class="slide-dot" data-slide="4"></div>
+                <div class="slide-dot" data-slide="5"></div>
+                <div class="slide-dot" data-slide="6"></div>
+                <div class="slide-dot" data-slide="7"></div>
+                <div class="slide-dot" data-slide="8"></div>
+                <div class="slide-dot" data-slide="9"></div>
+            </div>
+            <button onclick="startAssessmentAfterCover()" class="btn-primary mt-6 px-8 py-3">
+                Begin Assessment →
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Assessment Container -->
+    <div class="max-w-6xl mx-auto" style="display: none;" id="main-container">
+        <!-- Header -->
+        <header class="mb-12 border-b border-gray-800 pb-6 flex justify-between items-end">
+            <div>
+                <h1 class="text-4xl font-bold tracking-widest">
+                    <span class="bh-letter">B</span><span class="r-letter">HRATHA</span> <span class="rupee">•</span>
+                </h1>
+                <p class="text-xs mt-2 uppercase tracking-tighter" style="color: var(--green);">Institutional Founding Council Assessment</p>
+            </div>
+            <div class="text-right hidden" id="progress-display">
+                <div id="progress-text" class="text-xs text-gray-500 mb-2">VERTICAL 0/8</div>
+                <div class="w-48 bg-gray-900 h-1">
+                    <div id="main-progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Section 1: Landing -->
+        <div id="landing" class="section-container">
+            <div class="p-10 mb-10 border" style="border-color: var(--orange);">
+                <h2 class="text-2xl mb-6 uppercase italic">System Initialize: Protocol 64</h2>
+                <p class="mb-8 leading-relaxed text-gray-400">
+                    To build a decentralized network across 19,000+ pin codes, we require 8 specific industrial temperaments. 
+                    This 64-point diagnostic will determine your structural alignment with the <span style="color: var(--green);">BHRATHA Foundation</span>.
+                </p>
+                <p class="text-sm text-gray-500 mb-10">
+                    Your responses are private. Your result determines whether consideration for the Founding Council (Numbers 2–101) is appropriate.
+                </p>
+                
+                <button onclick="startAssessment()" class="btn-primary px-8 py-4 mb-6">Begin Authentication</button>
+                
+                <div class="text-xs text-gray-500">
+                    <p class="mb-4">BHRATHA accepts builders of systems, not users of systems.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Assessment Flow (64 Questions) -->
+        <div id="assessment-flow" class="section-container">
+            <div id="section-title" class="mb-2 uppercase text-sm font-bold" style="color: var(--green);"></div>
+            <h2 id="question-text" class="text-2xl mb-8"></h2>
+            
+            <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- Options will be populated here -->
+            </div>
+
+            <!-- Interest Radio Button -->
+            <div class="interest-radio">
+                <p class="mb-4" style="color: var(--orange);">Is this interesting for you?</p>
+                <div>
+                    <label class="radio-option">
+                        <input type="radio" name="interest" value="yes" onchange="handleInterestChange()">
+                        <span>Yes</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="interest" value="no" onchange="handleInterestChange()">
+                        <span>No</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mt-10">
+                <span id="question-counter" class="text-gray-600 text-xs">Q 1 / 64</span>
+                <button id="next-btn" onclick="nextQuestion()" class="btn-primary px-6 py-2 opacity-50" disabled>Next Segment →</button>
+            </div>
+        </div>
+
+        <!-- Section 3: Final Questions -->
+        <div id="final-section" class="section-container">
+            <div class="p-8 border" style="border-color: var(--green);">
+                <h2 class="text-2xl mb-6 uppercase">Final Alignment Assessment</h2>
+                
+                <div class="space-y-8 mb-10">
+                    <div>
+                        <h3 class="text-lg mb-4">Why do you seek a brotherhood?</h3>
+                        <textarea class="text-input h-32" id="q-brotherhood" placeholder="Your response..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg mb-4">Why unseen influence over public recognition?</h3>
+                        <textarea class="text-input h-32" id="q-influence" placeholder="Your response..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg mb-4">Why institutions over assets?</h3>
+                        <textarea class="text-input h-32" id="q-institutions" placeholder="Your response..."></textarea>
+                    </div>
+                </div>
+
+                <div class="mb-10">
+                    <h3 class="text-lg mb-6" style="color: var(--orange);">Final Declaration</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="checkbox-custom" onclick="toggleCheckbox(this)"></div>
+                            <span class="text-sm">I accept BHRATHA is not networking</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="checkbox-custom" onclick="toggleCheckbox(this)"></div>
+                            <span class="text-sm">I accept no guaranteed returns</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="checkbox-custom" onclick="toggleCheckbox(this)"></div>
+                            <span class="text-sm">I accept discretion obligations</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="checkbox-custom" onclick="toggleCheckbox(this)"></div>
+                            <span class="text-sm">I follow clean-money policy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="showSection('assessment-flow')" class="btn-primary px-6 py-2">← Back</button>
+                    <button onclick="calculateResults()" class="btn-primary px-6 py-2">View Assessment Results</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Results -->
+        <div id="results" class="section-container">
+            <div class="p-8 border" style="border-color: var(--green);">
+                <h2 class="text-3xl mb-2 uppercase">Authentication Complete</h2>
+                <p class="mb-8 font-bold uppercase" style="color: var(--orange);">FOUNDING PERSONA IDENTIFIED</p>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-10">
+                    <div id="persona-display" class="p-6 border border-gray-800">
+                        <h3 id="persona-name" class="text-2xl mb-4" style="color: var(--green);"></h3>
+                        <p id="persona-jd" class="text-sm text-gray-400 leading-relaxed mb-6"></p>
+                        <div class="mt-6">
+                            <div class="text-xs uppercase text-gray-500 mb-2">Operational Target</div>
+                            <div class="">19,101 Pin Codes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="p-4 bg-gray-900 border-l-4" style="border-color: var(--blue);">
+                            <p class="text-xs uppercase text-gray-500">Board Tier</p>
+                            <p class="">Founding Council (Subscribers)</p>
+                        </div>
+                        <div class="p-4 bg-gray-900 border-l-4" style="border-color: var(--orange);">
+                            <p class="text-xs uppercase text-gray-500">Alignment Score</p>
+                            <p id="alignment-score" class="text-2xl"></p>
+                        </div>
+                        <div class="p-4 bg-gray-900 border-l-4 border-gray-600">
+                            <p class="text-xs uppercase text-gray-500">Risk Vector</p>
+                            <p id="risk-vector" class=""></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Job Actions -->
+                <div class="daily-actions">
+                    <h4>Your Daily Role in Three Actions:</h4>
+                    <ul id="daily-actions-list">
+                        <!-- Will be populated dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Job Like/Dislike -->
+                <div class="mt-8 p-6 border border-gray-800">
+                    <p class="mb-4" style="color: var(--orange);">Do you like this job?</p>
+                    <div class="flex space-x-6">
+                        <label class="flex items-center">
+                            <input type="radio" name="job-like" value="yes" class="mr-2" style="accent-color: var(--green);">
+                            <span>Yes</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="job-like" value="no" class="mr-2" style="accent-color: var(--blue);">
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Summary of Interest Responses -->
+                <div class="mt-8 p-6 border border-gray-800">
+                    <h4 class="mb-4" style="color: var(--green);">Your Interest Summary</h4>
+                    <p id="interest-summary" class="text-sm text-gray-400"></p>
+                </div>
+
+                <div class="text-center mt-12">
+                    <button onclick="showSection('application')" class="btn-primary px-12 py-4 text-lg mb-4">
+                        Request Council Consideration
+                    </button>
+                    <p class="text-xs text-gray-500">
+                        BHRATHA membership requires ₹1.08 Cr as capital seriousness, independent of any investment participation.
+                    </p>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="restartAssessment()" class="text-sm underline" style="color: var(--blue);">
+                        Restart Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Application -->
+        <div id="application" class="section-container">
+            <div class="p-8 border" style="border-color: var(--orange);">
+                <h2 class="text-2xl mb-6 uppercase">Request for Council Consideration</h2>
+                
+                <div class="space-y-6 mb-10">
+                    <div>
+                        <label class="block mb-2 text-sm">Legal Full Name</label>
+                        <input type="text" class="text-input" id="app-name">
+                    </div>
+                    
+                    <div>
+                        <label class="block mb-2 text-sm">Secure Email</label>
+                        <input type="email" class="text-input" id="app-email">
+                    </div>
+                    
+                    <div>
+                        <label class="block mb-2 text-sm">Background Summary</label>
+                        <textarea class="text-input h-32" id="app-background"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block mb-2 text-sm">Capital Declaration (Approximate)</label>
+                        <select class="text-input" id="app-capital">
+                            <option value="">Select range</option>
+                            <option value="<50L">&lt; ₹50L</option>
+                            <option value="50L-2Cr">₹50L – ₹2 Cr</option>
+                            <option value="2Cr-10Cr">₹2 Cr – ₹10 Cr</option>
+                            <option value="10Cr-50Cr">₹10 Cr – ₹50 Cr</option>
+                            <option value="50Cr+">₹50 Cr+</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block mb-2 text-sm">References (Names & Context)</label>
+                        <textarea class="text-input h-24" id="app-references"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center mt-6">
+                        <div class="checkbox-custom" onclick="toggleCheckbox(this)"></div>
+                        <span class="text-sm">I accept confidentiality and privacy obligations</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="showSection('results')" class="btn-primary px-6 py-2">← Back</button>
+                    <button onclick="submitApplication()" class="btn-primary px-6 py-2">Submit for Council Review</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Completion -->
+        <div id="complete" class="section-container">
+            <div class="p-10 border text-center" style="border-color: var(--green);">
+                <div class="text-6xl mb-8" style="color: var(--orange);">—</div>
+                <h2 class="text-3xl mb-6">Request Logged</h2>
+                
+                <div class="max-w-2xl mx-auto mb-10">
+                    <p class="text-lg mb-8">
+                        Your request for Founding Council consideration has been recorded.
+                    </p>
+                    <p class="text-gray-400 mb-10">
+                        This is not an acceptance. This is not a promise.<br>
+                        This is a log of your expression of interest.
+                    </p>
+                    <p class="text-xl" style="color: var(--green);">
+                        You will be contacted if alignment exists.
+                    </p>
+                </div>
+                
+                <div class="text-sm text-gray-500">
+                    <p>BHRATHA accepts builders of systems, not users of systems.</p>
+                    <p class="mt-4">
+                        <a href="#" onclick="restartAssessment()" style="color: var(--orange); text-decoration: underline;">
+                            Restart assessment →
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATA STRUCTURES ====================
+        const verticals = [
+            { 
+                id: 'admin', 
+                name: 'Regulatory Administration', 
+                persona: 'The Bureaucrat', 
+                jd: 'Guardian of Governance. Responsible for navigating Ministry of Corporate Affairs, licensing, and Government relations.',
+                risk: 'Regulatory Capture',
+                dailyActions: [
+                    'Review and submit Ministry of Corporate Affairs filings',
+                    'Coordinate with state-level licensing authorities',
+                    'Navigate ambiguous regulatory environments'
+                ],
+                questions: [
+                    "How familiar are you with Ministry of Corporate Affairs filings?",
+                    "Experience with multi-state licensing compliance?",
+                    "Ability to navigate ambiguous regulatory environments?",
+                    "Track record of clean audit history?",
+                    "Experience with government tender processes?",
+                    "Understanding of foreign investment regulations?",
+                    "Ability to manage regulatory crisis communications?",
+                    "Experience with corporate restructuring for compliance?"
+                ]
+            },
+            { 
+                id: 'fiscal', 
+                name: 'Capital Discipline', 
+                persona: 'The Accountant', 
+                jd: 'Keeper of the Corpus. Manages clean-money policies, 12A/80G compliance, and fiscal transparency.',
+                risk: 'Capital Misallocation',
+                dailyActions: [
+                    'Monitor capital allocations exceeding ₹100 Cr',
+                    'Maintain 12A/80G trust compliance',
+                    'Oversee clean money documentation'
+                ],
+                questions: [
+                    "Experience managing capital exceeding ₹100 Cr?",
+                    "Familiarity with 12A/80G trust registration?",
+                    "Track record of clean money documentation?",
+                    "Experience with multi-currency capital allocation?",
+                    "Understanding of RBI's investment guidelines?",
+                    "Ability to create 10-year capital deployment plans?",
+                    "Experience with distressed asset valuation?",
+                    "Familiarity with SEBI's alternative investment funds?"
+                ]
+            },
+            { 
+                id: 'design', 
+                name: 'Structural Architecture', 
+                persona: 'The Architect', 
+                jd: 'Designer of Space. Responsible for the modern, Vastu-compliant blueprints of BHRATHA Hubs across India.',
+                risk: 'Design Fragmentation',
+                dailyActions: [
+                    'Design spaces larger than 50,000 sq ft',
+                    'Ensure Vastu compliance in modern designs',
+                    'Create modular, scalable architecture'
+                ],
+                questions: [
+                    "Experience designing spaces larger than 50,000 sq ft?",
+                    "Familiarity with Vastu compliance in modern design?",
+                    "Track record of modular, scalable architecture?",
+                    "Experience with cultural-adaptive design?",
+                    "Understanding of energy-efficient building systems?",
+                    "Ability to design for female-only safe spaces?",
+                    "Experience with heritage-modern fusion?",
+                    "Familiarity with smart building IoT integration?"
+                ]
+            },
+            { 
+                id: 'infra', 
+                name: 'Infrastructure Rollout', 
+                persona: 'The Builder', 
+                jd: 'Foundation Lead. Handles physical construction, supply chains, and hub readiness for 19,000 districts.',
+                risk: 'Execution Paralysis',
+                dailyActions: [
+                    'Manage 100+ site rollouts simultaneously',
+                    'Coordinate rural infrastructure development',
+                    'Ensure on-time, on-budget delivery'
+                ],
+                questions: [
+                    "Experience managing 100+ site rollouts?",
+                    "Familiarity with rural infrastructure challenges?",
+                    "Track record of on-time, on-budget delivery?",
+                    "Experience with modular construction techniques?",
+                    "Understanding of last-mile logistics?",
+                    "Ability to manage cross-state contractor networks?",
+                    "Experience with sustainable material sourcing?",
+                    "Familiarity with disaster-resilient construction?"
+                ]
+            },
+            { 
+                id: 'hospitality', 
+                name: 'Resource Nourishment', 
+                persona: 'The Kitchen Specialist', 
+                jd: 'Nourisher of Ambition. Designs the cafeteria and nutrition systems within every BHRATHA hub.',
+                risk: 'Supply Chain Failure',
+                dailyActions: [
+                    'Oversee feeding 1000+ people daily',
+                    'Design nutritional programs',
+                    'Manage farm-to-table supply chains'
+                ],
+                questions: [
+                    "Experience feeding 1000+ people daily?",
+                    "Familiarity with regional dietary restrictions?",
+                    "Track record of nutritional program design?",
+                    "Experience with farm-to-table supply chains?",
+                    "Understanding of commercial kitchen scalability?",
+                    "Ability to design cost-efficient menu cycles?",
+                    "Experience with community dining psychology?",
+                    "Familiarity with food safety certification?"
+                ]
+            },
+            { 
+                id: 'legal', 
+                name: 'Legal Defense', 
+                persona: 'The Advocate', 
+                jd: 'Protector of the Brand. Handles Supreme Court level litigations, TM protection, and women-only policy defense.',
+                risk: 'Legal Vulnerability',
+                dailyActions: [
+                    'Handle Supreme Court litigation cases',
+                    'Protect intellectual property rights',
+                    'Defend constitutional challenges'
+                ],
+                questions: [
+                    "Experience with Supreme Court litigation?",
+                    "Familiarity with intellectual property protection?",
+                    "Track record of defending constitutional challenges?",
+                    "Experience with cross-border legal frameworks?",
+                    "Understanding of women's safety legislation?",
+                    "Ability to navigate media-trial environments?",
+                    "Experience with nonprofit legal structures?",
+                    "Familiarity with data protection laws?"
+                ]
+            },
+            { 
+                id: 'health', 
+                name: 'Community Wellness', 
+                persona: 'The Doctor', 
+                jd: 'Doctor of Well-being. Oversees crèche protocols and female health awareness within the hubs.',
+                risk: 'Community Health Crisis',
+                dailyActions: [
+                    'Design institutional health programs',
+                    'Oversee crèche and childcare regulations',
+                    'Implement mental health initiatives'
+                ],
+                questions: [
+                    "Experience designing institutional health programs?",
+                    "Familiarity with crèche and childcare regulations?",
+                    "Track record of mental health initiatives?",
+                    "Experience with women's health awareness programs?",
+                    "Understanding of preventive healthcare systems?",
+                    "Ability to design scalable wellness programs?",
+                    "Experience with emergency medical response?",
+                    "Familiarity with healthcare partnership models?"
+                ]
+            },
+            { 
+                id: 'media', 
+                name: 'Narrative & Media', 
+                persona: 'The Media Mogul', 
+                jd: 'The Voice of Victory. Drives GTM strategy, PR, and the public identity of the BHRATHA movement.',
+                risk: 'Narrative Collapse',
+                dailyActions: [
+                    'Manage brand crises and reputation',
+                    'Build multi-platform narratives',
+                    'Design long-term narrative arcs'
+                ],
+                questions: [
+                    "Experience managing brand crises?",
+                    "Familiarity with multi-platform narrative building?",
+                    "Track record of cultural movement creation?",
+                    "Experience with discreet influence operations?",
+                    "Understanding of digital reputation management?",
+                    "Ability to design long-term narrative arcs?",
+                    "Experience with traditional media relations?",
+                    "Familiarity with community storytelling?"
+                ]
+            }
+        ];
+
+        // ==================== STATE MANAGEMENT ====================
+        let currentVerticalIndex = 0;
+        let currentQuestionIndex = 0;
+        let scores = {};
+        let interestResponses = [];
+        let assessmentState = {
+            answers: {},
+            currentSection: 'landing'
+        };
+
+        // Initialize scores
+        verticals.forEach(v => scores[v.id] = 0);
+
+        // ==================== COVER SLIDES FUNCTIONS ====================
+        let currentSlide = 0;
+        const totalSlides = 10;
+
+        function showSlide(slideIndex) {
+            const slides = document.querySelectorAll('.cover-slide');
+            const dots = document.querySelectorAll('.slide-dot');
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[slideIndex].classList.add('active');
+            dots[slideIndex].classList.add('active');
+            currentSlide = slideIndex;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function startAssessmentAfterCover() {
+            document.getElementById('cover').style.display = 'none';
+            document.getElementById('main-container').style.display = 'block';
+            showSection('landing');
+        }
+
+        // Initialize slide dots
+        document.addEventListener('DOMContentLoaded', function() {
+            const dotsContainer = document.querySelector('.slide-navigation .flex');
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = dotsContainer.children[i];
+                if (dot) {
+                    dot.addEventListener('click', () => showSlide(i));
+                }
+            }
+
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (document.getElementById('cover').classList.contains('active')) {
+                    if (e.key === 'ArrowRight') nextSlide();
+                    if (e.key === 'ArrowLeft') prevSlide();
+                    if (e.key === 'Enter') startAssessmentAfterCover();
+                }
+            });
+        });
+
+        // ==================== ASSESSMENT FUNCTIONS ====================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section-container').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                assessmentState.currentSection = sectionId;
+                
+                if (sectionId === 'assessment-flow') {
+                    document.getElementById('progress-display').classList.remove('hidden');
+                } else {
+                    document.getElementById('progress-display').classList.add('hidden');
+                }
+                
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function startAssessment() {
+            showSection('assessment-flow');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const v = verticals[currentVerticalIndex];
+            const questionNumber = currentVerticalIndex * 8 + currentQuestionIndex + 1;
+            
+            document.getElementById('section-title').innerText = `VERTICAL: ${v.name}`;
+            document.getElementById('question-text').innerText = `${questionNumber}. ${v.questions[currentQuestionIndex]}`;
+            document.getElementById('question-counter').innerText = `Q ${questionNumber} / 64`;
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            const options = [
+                { text: "Mastery (10+ years experience)", value: 4 },
+                { text: "Strategic (5-10 years experience)", value: 3 },
+                { text: "Operational (2-5 years experience)", value: 2 },
+                { text: "Awareness (Limited exposure)", value: 1 }
+            ];
+            
+            options.forEach((opt, i) => {
+                const card = document.createElement('div');
+                card.className = 'question-card p-4 text-sm';
+                card.innerText = opt.text;
+                card.onclick = () => selectOption(card, v.id, opt.value);
+                grid.appendChild(card);
+            });
+
+            // Update progress
+            const totalProgress = (questionNumber / 64) * 100;
+            document.getElementById('main-progress').style.width = `${totalProgress}%`;
+            document.getElementById('progress-text').innerText = `VERTICAL ${currentVerticalIndex + 1}/8`;
+            
+            // Reset next button and interest radio
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').classList.add('opacity-50');
+            document.querySelectorAll('input[name="interest"]').forEach(radio => {
+                radio.checked = false;
+            });
+        }
+
+        function selectOption(element, verticalId, value) {
+            // Deselect all options
+            document.querySelectorAll('#options-grid .question-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select current option
+            element.classList.add('selected');
+            
+            // Store answer
+            const questionKey = `q${currentVerticalIndex}_${currentQuestionIndex}`;
+            assessmentState.answers[questionKey] = value;
+        }
+
+        function handleInterestChange() {
+            const selectedInterest = document.querySelector('input[name="interest"]:checked');
+            if (selectedInterest && document.querySelectorAll('#options-grid .question-card.selected').length > 0) {
+                document.getElementById('next-btn').disabled = false;
+                document.getElementById('next-btn').classList.remove('opacity-50');
+                
+                // Store interest response
+                interestResponses[currentVerticalIndex * 8 + currentQuestionIndex] = selectedInterest.value;
+            }
+        }
+
+        function nextQuestion() {
+            // Store score for current question
+            const questionKey = `q${currentVerticalIndex}_${currentQuestionIndex}`;
+            const answerValue = assessmentState.answers[questionKey];
+            if (answerValue) {
+                scores[verticals[currentVerticalIndex].id] += answerValue;
+            }
+            
+            // Move to next question or vertical
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex >= 8) {
+                currentVerticalIndex++;
+                currentQuestionIndex = 0;
+            }
+            
+            if (currentVerticalIndex >= verticals.length) {
+                showSection('final-section');
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function toggleCheckbox(element) {
+            element.classList.toggle('checked');
+        }
+
+        function calculateResults() {
+            // Validate final section
+            const textAnswers = ['q-brotherhood', 'q-influence', 'q-institutions'];
+            const allTextFilled = textAnswers.every(id => {
+                const el = document.getElementById(id);
+                return el && el.value.trim().length > 0;
+            });
+            
+            if (!allTextFilled) {
+                alert('Please complete all text responses before viewing results.');
+                return;
+            }
+            
+            // Find highest scoring vertical
+            let maxScore = 0;
+            let winningVertical = verticals[0];
+            
+            Object.keys(scores).forEach(key => {
+                if (scores[key] > maxScore) {
+                    maxScore = scores[key];
+                    winningVertical = verticals.find(v => v.id === key);
+                }
+            });
+            
+            // Calculate alignment score (max 32 per vertical)
+            const alignmentPercent = Math.round((maxScore / 32) * 100);
+            
+            // Display results
+            document.getElementById('persona-name').innerText = winningVertical.persona;
+            document.getElementById('persona-jd').innerText = winningVertical.jd;
+            document.getElementById('alignment-score').innerText = `${alignmentPercent}% Alignment`;
+            document.getElementById('alignment-score').style.color = alignmentPercent >= 70 ? 'var(--green)' : 
+                                                                      alignmentPercent >= 50 ? 'var(--orange)' : 'var(--blue)';
+            document.getElementById('risk-vector').innerText = winningVertical.risk;
+            
+            // Display daily actions
+            const actionsList = document.getElementById('daily-actions-list');
+            actionsList.innerHTML = '';
+            winningVertical.dailyActions.forEach(action => {
+                const li = document.createElement('li');
+                li.textContent = action;
+                actionsList.appendChild(li);
+            });
+            
+            // Calculate interest summary
+            const yesCount = interestResponses.filter(r => r === 'yes').length;
+            const noCount = interestResponses.filter(r => r === 'no').length;
+            const totalAnswered = yesCount + noCount;
+            const interestPercent = totalAnswered > 0 ? Math.round((yesCount / totalAnswered) * 100) : 0;
+            
+            document.getElementById('interest-summary').innerHTML = `
+                You found <strong>${yesCount} out of ${totalAnswered}</strong> questions interesting (${interestPercent}% alignment).
+                ${interestPercent >= 70 ? 'High interest alignment!' : interestPercent >= 50 ? 'Moderate interest alignment.' : 'Consider if this role truly interests you.'}
+            `;
+            
+            showSection('results');
+        }
+
+        function submitApplication() {
+            const name = document.getElementById('app-name').value.trim();
+            const email = document.getElementById('app-email').value.trim();
+            const background = document.getElementById('app-background').value.trim();
+            const capital = document.getElementById('app-capital').value;
+            const references = document.getElementById('app-references').value.trim();
+            
+            // Check confidentiality checkbox
+            const confidentialityChecked = document.querySelector('#application .checkbox-custom.checked');
+            
+            if (!name || !email || !background || !capital || !references || !confidentialityChecked) {
+                alert('Please complete all fields and confirm confidentiality before submitting.');
+                return;
+            }
+            
+            // Log submission
+            console.log('Council Application:', {
+                name,
+                email,
+                background,
+                capital,
+                references,
+                persona: document.getElementById('persona-name').innerText,
+                scores,
+                interestResponses
+            });
+            
+            showSection('complete');
+        }
+
+        function restartAssessment() {
+            // Reset state
+            currentVerticalIndex = 0;
+            currentQuestionIndex = 0;
+            assessmentState.answers = {};
+            interestResponses = [];
+            verticals.forEach(v => scores[v.id] = 0);
+            
+            // Reset UI
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.checkbox-custom').forEach(cb => {
+                cb.classList.remove('checked');
+            });
+            
+            document.querySelectorAll('textarea').forEach(ta => {
+                ta.value = '';
+            });
+            
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type !== 'button' && input.type !== 'submit') {
+                    input.value = '';
+                    input.checked = false;
+                }
+            });
+            
+            // Reset cover slides
+            document.getElementById('cover').style.display = 'block';
+            document.getElementById('main-container').style.display = 'none';
+            showSlide(0);
+        }
+    </script>
+</body>
+</html>
